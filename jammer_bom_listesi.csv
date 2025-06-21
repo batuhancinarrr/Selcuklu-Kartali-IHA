@@ -1,0 +1,12 @@
+#,Bileşen,Miktar,Açıklama
+1,STM32F103C8T6,1,Ana mikrodenetleyici – Bluepill geliştirme kartı önerilir
+2,SSD1306 OLED 0.96” I2C,1,"128x64 I2C OLED ekran (VCC, GND, SCL, SDA pinli)"
+3,Tactile Button (6x6 mm),2,Kanal seçme ve aktif/pasif butonları
+4,IRLZ44N MOSFET,5,"Her bir RF kanalının anahtarlanması için (433, 868, GSM, GPS, WiFi)"
+5,10kΩ Direnç,5,MOSFET gate pull-down için
+6,PWM kontrollü fan (5V/12V),1,Soğutma fanı – TIM2 PWM çıkışıyla hız kontrolü yapılır
+7,220Ω Direnç,2,Buton pinleri için seri direnç (debounce amacıyla önerilir)
+8,0.1µF Seramik Kondansatör,3,Güç hatlarında decoupling için (STM32 ve OLED için)
+9,PCB (2 katmanlı),1,Gerber dosyalarıyla üretilen kart (her kanal ayrı ayrı)
+10,Header pinler (erkek/dişi),n/a,"OLED, STM32, fan ve RF modül bağlantıları için"
+11,12V güç kaynağı,1,Jammer kartlarını ve fanı beslemek için

@@ -1,0 +1,13 @@
+Ref,Parça,Değer,Paket,Adet,Açıklama
+U1,STM32F103C8T6,-,LQFP-48,1,Mikrodenetleyici
+U2,MCP2551,-,SOIC-8,1,CAN Transceiver
+U3,RFM95W,868 MHz,SMD,1,LoRa Modülü
+U4,RF2126,1W,QFN,1,RF Amplifikatör
+Q1,IRLZ44N,-,TO-220,1,MOSFET
+D1,1N5819,-,DO-41,1,Koruma diyotu
+R1,Direnç,1kΩ,0603,1,Sinyal kontrolü
+R2,Direnç,10kΩ,0603,1,Pull-up
+C1,Kondansatör,100nF,0603,1,Decoupling
+C2,Kondansatör,10uF,0805,1,Güç filtresi
+L1,Endüktans,10uH,SMD,1,EMI filtre
+J1,SMA Konnektör,-,Edge Mount,3,Anten bağlantısı

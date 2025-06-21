@@ -1,47 +1,89 @@
 
-import tkinter as tk
-from tkinter import ttk
+# yer_istasyonu_gui.py
+# PyQt5 tabanlı, LoRa ile haberleşen bir yer kontrol istasyonu arayüzü
+
+import sys
 import serial
 import threading
-import csv
-from datetime import datetime
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QPushButton,
+    QLabel, QTextEdit, QLineEdit, QHBoxLayout
+)
+from PyQt5.QtCore import QTimer
 
-lora = serial.Serial("/dev/serial0", 9600)
-root = tk.Tk()
-root.title("İHA Yer İstasyonu")
-root.geometry("600x400")
+class YerIstasyonu(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Yer Kontrol İstasyonu")
+        self.setGeometry(100, 100, 500, 400)
 
-telemetry_text = tk.StringVar()
-ttk.Label(root, textvariable=telemetry_text, font=("Courier", 10), justify="left").pack(pady=10)
+        self.ser = None
+        self.serial_thread = None
+        self.init_ui()
+        self.connect_serial()
 
-def read_telemetry():
-    with open("log.csv", "w", newline='') as logfile:
-        writer = csv.writer(logfile)
-        writer.writerow(["Zaman", "Alt", "Batarya"])
+    def init_ui(self):
+        layout = QVBoxLayout()
+
+        self.status_label = QLabel("Durum: Bağlantı yok")
+        layout.addWidget(self.status_label)
+
+        self.output_area = QTextEdit()
+        self.output_area.setReadOnly(True)
+        layout.addWidget(self.output_area)
+
+        # Komut girişi
+        command_layout = QHBoxLayout()
+        self.command_input = QLineEdit()
+        self.command_input.setPlaceholderText("Komut gir (örn: STATUS)")
+        self.send_button = QPushButton("Gönder")
+        self.send_button.clicked.connect(self.send_command)
+        command_layout.addWidget(self.command_input)
+        command_layout.addWidget(self.send_button)
+
+        layout.addLayout(command_layout)
+
+        # Hızlı komutlar
+        quick_layout = QHBoxLayout()
+        self.addwp_btn = QPushButton("ADDWP (örnek)")
+        self.addwp_btn.clicked.connect(lambda: self.send_command("ADDWP,41.0,29.0"))
+        self.clearwp_btn = QPushButton("CLEARWP")
+        self.clearwp_btn.clicked.connect(lambda: self.send_command("CLEARWP"))
+        self.emergency_btn = QPushButton("EMERGENCY_LAND")
+        self.emergency_btn.clicked.connect(lambda: self.send_command("EMERGENCY_LAND"))
+
+        quick_layout.addWidget(self.addwp_btn)
+        quick_layout.addWidget(self.clearwp_btn)
+        quick_layout.addWidget(self.emergency_btn)
+        layout.addLayout(quick_layout)
+
+        self.setLayout(layout)
+
+    def connect_serial(self):
+        try:
+            self.ser = serial.Serial('COM3', 9600, timeout=1)  # Gerekirse portu değiştir
+            self.status_label.setText("Durum: Bağlandı (COM3)")
+            self.serial_thread = threading.Thread(target=self.read_serial, daemon=True)
+            self.serial_thread.start()
+        except:
+            self.status_label.setText("Durum: Seri port bağlantı hatası")
+
+    def send_command(self, cmd=None):
+        if cmd is None:
+            cmd = self.command_input.text()
+        if self.ser and self.ser.is_open:
+            self.ser.write((cmd + '\n').encode())
+            self.output_area.append("Gönderildi: " + cmd)
+
+    def read_serial(self):
         while True:
-            if lora.in_waiting:
-                line = lora.readline().decode(errors='ignore').strip()
-                if line.startswith("$TEL"):
-                    data = line.split(",")
-                    now = datetime.now().strftime("%H:%M:%S")
-                    try:
-                        alt = data[1].split(":")[1]
-                        batt = data[2].split(":")[1]
-                        telemetry = f"Zaman: {now}\nİrtifa: {alt} m\nBatarya: {batt}"
-                        telemetry_text.set(telemetry)
-                        writer.writerow([now, alt, batt])
-                        logfile.flush()
-                    except:
-                        continue
+            if self.ser and self.ser.in_waiting:
+                line = self.ser.readline().decode(errors='ignore').strip()
+                if line:
+                    self.output_area.append("Drone: " + line)
 
-def send_command(cmd):
-    lora.write(f"$CMD,{cmd}\n".encode())
-
-btn_frame = ttk.Frame(root)
-btn_frame.pack(pady=10)
-ttk.Button(btn_frame, text="Kalkış", command=lambda: send_command("TAKEOFF")).pack(side="left", padx=5)
-ttk.Button(btn_frame, text="İniş", command=lambda: send_command("LAND")).pack(side="left", padx=5)
-ttk.Button(btn_frame, text="Yüksekliği 120m yap", command=lambda: send_command("SETALT:120")).pack(side="left", padx=5)
-
-threading.Thread(target=read_telemetry, daemon=True).start()
-root.mainloop()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = YerIstasyonu()
+    window.show()
+    sys.exit(app.exec_())

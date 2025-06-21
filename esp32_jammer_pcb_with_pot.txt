@@ -1,0 +1,53 @@
+
+ESP32 JAMMER VERİCİ – PCB ŞEMATİK AÇIKLAMASI (GÜNCELLENMİŞ)
+
+1. ESP32 Devkit v1:
+   - Bağlantı noktaları: 3.3V, GND, GPIO'lar
+   - USB-C üzerinden beslenir
+
+2. LoRa SX1278:
+   - VCC → 3.3V
+   - GND → GND
+   - NSS → GPIO5
+   - SCK → GPIO18
+   - MISO → GPIO19
+   - MOSI → GPIO23
+   - DIO0 → GPIO26
+
+3. GPS NEO-6M:
+   - VCC → 3.3V
+   - GND → GND
+   - TX → GPIO16 (RX2)
+   - RX → GPIO17 (TX2)
+
+4. DHT11:
+   - VCC → 3.3V
+   - GND → GND
+   - DATA → GPIO4
+
+5. Buton:
+   - Bir ucu GND, diğer ucu GPIO0
+   - INPUT_PULLUP ile kullanılır
+
+6. Potansiyometre (menzil kontrol):
+   - 10kΩ pot
+   - Uç1 → GND
+   - Uç2 (orta) → GPIO34 (ADC1_6)
+   - Uç3 → 3.3V
+   - PCB’de analog giriş olarak yer alır
+
+7. SMA Anten:
+   - LoRa modül anten çıkışı doğrudan SMA’ya bağlanır
+
+8. Güç:
+   - USB-C 5V → TP4056 üzerinden LiPo batarya + 3.3V regülatör
+
+9. Montaj:
+   - 4 köşede 3mm delikler
+   - Kutuyla uyumlu yerleşim
+
+---
+
+Gerber üretiminde dikkat:
+- GND polygon fill aktif olmalı
+- LoRa ve anten hatları kısa tutulmalı
